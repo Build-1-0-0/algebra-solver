@@ -1,4 +1,4 @@
-# wrangler.toml
 name = "algebra-solver"
-compatibility_date = "2025-04-30"
 pages_build_output_dir = "."
+[vars]
+NODE_VERSION = "23.11.0"
