@@ -1,43 +1,37 @@
 // main.js
-// Add a message to the chat
 function addMessage(text, className) {
   const messages = document.getElementById("messages");
   const message = document.createElement("div");
   message.className = `message ${className}`;
   message.textContent = text;
+  message.setAttribute("tabindex", "0"); // Focusable for accessibility
   messages.appendChild(message);
   messages.scrollTop = messages.scrollHeight;
 }
 
-// Handle equation solving
 async function handleSolve() {
   const textarea = document.getElementById("equation");
   const equation = textarea.value.trim();
   if (!equation) return;
 
-  // Show user input and clear textarea
   addMessage(equation, "user-message");
   textarea.value = "";
   textarea.style.height = "auto";
 
-  // Show temporary "Solving..." message
   addMessage("Solving...", "bot-message thinking");
-  
   const result = await solveEquation(equation);
-  
-  // Remove "Solving..." message
-  const thinking = document.querySelector(".thinking");
-  if (thinking) thinking.remove();
+  document.querySelector(".thinking")?.remove();
 
-  // Display result
   if (result.error) {
     addMessage(result.error, "error-message");
   } else {
-    addMessage(result.solution, "bot-message");
+    const solutionMessage = `${result.solution} (Copy: ${equation} → ${result.solution})`;
+    addMessage(solutionMessage, "bot-message");
+    // Auto-focus the solution for accessibility
+    document.querySelector(".bot-message:last-child").focus();
   }
 }
 
-// Initialize UI and solver
 document.addEventListener("DOMContentLoaded", async () => {
   const textarea = document.getElementById("equation");
   const sendBtn = document.getElementById("send-btn");
@@ -60,7 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Delegate click events for future buttons (e.g., feature toggles)
+  // Delegate click events
   inputContainer.addEventListener("click", (e) => {
     if (e.target.matches("#send-btn")) {
       handleSolve();
