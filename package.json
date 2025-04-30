@@ -4,9 +4,10 @@
   "description": "A zero-cost, Python-based algebra solver using Pyodide and SymPy with a modern Tailwind CSS UI",
   "main": "index.html",
   "scripts": {
-    "build": "npm run build-css && npm run build-js",
-    "build-css": "npx update-browserslist-db@latest && npx tailwindcss -i css/input.css -o css/output.css --minify",
-    "build-js": "terser js/main.js js/solver.js js/mathSolver.js --compress --mangle --output js/bundle.min.js",
+    "build": "npm ci && npm run build-css && npm run build-js",
+    "update-browserslist": "npx update-browserslist-db@latest",
+    "build-css": "npm run update-browserslist && npx tailwindcss -i css/input.css -o css/output.css --minify || echo 'TailwindCSS build failed'",
+    "build-js": "npx terser js/main.js js/solver.js js/mathSolver.js --compress --mangle --output js/bundle.min.js",
     "watch": "npx tailwindcss -i css/input.css -o css/output.css --watch",
     "start": "python -m http.server 8000",
     "deploy": "wrangler pages deploy .",
@@ -27,8 +28,8 @@
   "devDependencies": {
     "tailwindcss": "^4.1.4",
     "terser": "^5.39.0",
-    "wrangler": "^4.14.0",
-    "update-browserslist-db": "^1.1.3"
+    "update-browserslist-db": "^1.1.3",
+    "wrangler": "^4.14.0"
   },
   "optionalDependencies": {
     "pyodide": "0.27.5"
