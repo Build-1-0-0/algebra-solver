@@ -4,197 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dynamic Algebra Solver</title>
-  <!-- Load Pyodide -->
+  <link rel="stylesheet" href="css/output.css">
   <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 20px;
-    }
-    #chat-container {
-      width: 100%;
-      max-width: 600px;
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      height: 80vh;
-    }
-    #messages {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .message {
-      max-width: 80%;
-      padding: 10px 15px;
-      border-radius: 10px;
-      animation: slideIn 0.3s ease-out;
-      margin: 5px 0;
-    }
-    .user-message {
-      background: #007bff;
-      color: #fff;
-      align-self: flex-end;
-      border-bottom-right-radius: 2px;
-    }
-    .bot-message {
-      background: #e9ecef;
-      color: #333;
-      align-self: flex-start;
-      border-bottom-left-radius: 2px;
-    }
-    .error-message {
-      background: #f8d7da;
-      color: #721c24;
-      align-self: flex-start;
-    }
-    #input-container {
-      padding: 10px;
-      background: #f8f9fa;
-      border-top: 1px solid #dee2e6;
-    }
-    #equation {
-      width: 100%;
-      border: none;
-      padding: 10px;
-      font-size: 16px;
-      resize: none;
-      background: transparent;
-      outline: none;
-      min-height: 40px;
-      max-height: 200px;
-      font-family: inherit;
-    }
-    #be {
-      content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20l8-8-8-8-8 8 8 8z'/%3E%3C/svg%3E") Send
-    </button>
-    #send-btn {
-      background: #007bff;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    #send-btn:hover {
-      background: #0056b3;
-    }
-    @keyframes slideIn {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    @media (max-width: 600px) {
-      #chat-container { height: 90vh; }
-      .message { max-width: 90%; }
-    }
-  </style>
 </head>
 <body>
-  <div id="chat-container">
-    <div id="messages">
-      <div class="bot-message">Welcome! Enter an equation like '2*x + 3 = 9' or 'x**2 - 4 = 0'.</div>
+  <div id="chat-container" class="w-full max-w-lg bg-white rounded-2xl shadow-xl flex flex-col h-[80vh]">
+    <div id="messages" class="flex-1 p-5 overflow-y-auto flex flex-col gap-2">
+      <div class="message bot-message">Welcome! Enter an equation like '2*x + 3 = 9' or 'x**2 - 4 = 0'.</div>
     </div>
-    <div id="input-container">
-      <textarea id="equation" placeholder="Type your equation..."></textarea>
-      <button id="send-btn" onclick="solveEquation()">Send</button>
+    <div id="input-container" class="p-3 bg-gray-50 border-t border-gray-200">
+      <textarea id="equation" class="w-full border-none p-3 text-base resize-none bg-transparent outline-none min-h-10 max-h-48 font-sans" placeholder="Type your equation..."></textarea>
+      <button id="send-btn" class="bg-chatBlue text-white px-5 py-2 rounded-md hover:bg-blue-700 transition">Send</button>
     </div>
   </div>
-
-  <script>
-    let pyodide;
-
-    // Initialize Pyodide and SymPy
-    async function loadPyodideAndSymPy() {
-      try {
-        pyodide = await loadPyodide();
-        await pyodide.loadPackage("micropip");
-        await pyodide.runPythonAsync(`
-          import micropip
-          await micropip.install('sympy')
-        `);
-        addMessage("Ready! Enter an equation.", "bot-message");
-      } catch (e) {
-        addMessage("Error loading solver. Please refresh.", "error-message");
-      }
-    }
-
-    // Add a message to the chat
-    function addMessage(text, className) {
-      const messages = document.getElementById("messages");
-      const message = document.createElement("div");
-      message.className = `message ${className}`;
-      message.textContent = text;
-      messages.appendChild(message);
-      messages.scrollTop = messages.scrollHeight;
-    }
-
-    // Auto-resize textarea
-    const textarea = document.getElementById("equation");
-    textarea.addEventListener("input", () => {
-      textarea.style.height = "auto";
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
-    });
-
-    // Solve the equation
-    async function solveEquation() {
-      const equation = textarea.value.trim();
-      if (!equation) return;
-      addMessage(equation, "user-message");
-      textarea.value = "";
-      textarea.style.height = "auto";
-
-      if (!equation.includes("=")) {
-        addMessage("Error: Please include '=' in the equation.", "error-message");
-        return;
-      }
-
-      try {
-        const [left, right] = equation.split('=').map(s => s.trim());
-        const result = await pyodide.runPythonAsync(`
-          from sympy import symbols, Eq, solve, sympify
-          x = symbols('x')
-          try:
-            left = sympify("${left.replace(/"/g, '\\"')}")
-            right = sympify("${right.replace(/"/g, '\\"')}")
-            eq = Eq(left, right)
-            solutions = solve(eq, x)
-            str(solutions)
-          except Exception as e:
-            "Error: " + str(e)
-        `);
-        if (result.startsWith("Error: ")) {
-          addMessage(result, "error-message");
-        } else {
-          addMessage(`Solution: x = ${result || 'No solution'}`, "bot-message");
-        }
-      } catch (e) {
-        addMessage("Error: Invalid input or unable to solve. Use syntax like '2*x + 3 = 9' or 'x**2 - 4 = 0'.", "error-message");
-      }
-    }
-
-    // Handle Enter key
-    textarea.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        solveEquation();
-      }
-    });
-
-    // Load Pyodide
-    loadPyodideAndSymPy();
-  </script>
+  <script src="js/solver.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
