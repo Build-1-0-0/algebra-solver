@@ -4,7 +4,7 @@ let pyodide;
 // Initialize Pyodide and SymPy
 async function initSolver() {
   try {
-    pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/' });
+    pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/' });
     await pyodide.loadPackage('micropip');
     await pyodide.runPythonAsync(`
       import micropip
