@@ -4,21 +4,57 @@
 
 @layer base {
   body {
-    @apply font-sans bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen flex items-start justify-center p-5;
+    @apply font-sans bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 min-h-screen flex items-center justify-center p-6 transition-colors duration-300 ease-in-out;
   }
 }
 
 @layer components {
+  .chat-container {
+    @apply w-full max-w-2xl bg-white/35 backdrop-blur-lg rounded-3xl shadow-2xl flex flex-col h-[85vh] border border-white/25 overflow-hidden;
+  }
   .message {
-    @apply max-w-[80%] p-3 rounded-lg animate-slideIn m-1;
+    @apply max-w-[85%] px-4 py-3 rounded-xl m-2 transition-transform duration-300 ease-in-out hover:scale-105;
   }
   .user-message {
-    @apply bg-chatBlue text-white self-end rounded-br-none;
+    @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white self-end rounded-br-none shadow-md;
   }
   .bot-message {
-    @apply bg-chatGray text-gray-800 self-start rounded-bl-none;
+    @apply bg-white/60 backdrop-blur-md text-gray-900 self-start rounded-bl-none shadow-md;
   }
   .error-message {
-    @apply bg-chatError text-red-800 self-start;
+    @apply bg-red-100/90 backdrop-blur-md text-red-900 self-start rounded-bl-none;
+  }
+  .thinking {
+    @apply bg-white/50 backdrop-blur-md text-gray-900 self-start rounded-bl-none animate-pulse relative;
+  }
+  .thinking::after {
+    @apply absolute bottom-1 right-2;
+    content: "...";
+    animation: dots 1.5s infinite;
+  }
+  .input-container {
+    @apply p-4 bg-white/30 backdrop-blur-lg border-t border-white/30;
+  }
+  .equation-textarea {
+    @apply w-full border-none p-3 text-base bg-transparent outline-none min-h-12 max-h-48 font-sans resize-none placeholder-gray-400;
+  }
+  .send-btn {
+    @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2 rounded-full hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-md hover:scale-105;
+  }
+}
+
+@layer utilities {
+  @keyframes slideIn {
+    from { transform: translateY(30px) scale(0.95); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  @keyframes dots {
+    0% { content: "."; }
+    33% { content: ".."; }
+    66% { content: "..."; }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
   }
 }
