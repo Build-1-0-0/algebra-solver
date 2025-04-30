@@ -23,7 +23,7 @@
     @apply bg-white/60 backdrop-blur-md text-gray-900 self-start rounded-bl-none shadow-md;
   }
   .error-message {
-    @apply bg-red-100/90 backdrop-blur-md text-red-900 self-start rounded-bl-none;
+    @apply bg-red-100/90 backdrop-blur-md text-red-900 self-start rounded-bl-none cursor-pointer;
   }
   .info-message {
     @apply bg-green-100 text-green-800 p-2 rounded;
