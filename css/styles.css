@@ -1,26 +1,4 @@
 /* css/styles.css */
-.thinking::before {
-  content: '';
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid #4a5568;
-  border-top-color: #1a202c;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-right: 8px;
-}
+@tailwind utilities;
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.info-message {
-  @apply bg-green-100 text-green-800 p-2 rounded;
-}
-
-.error-message {
-  @apply bg-red-100 text-red-800 p-2 rounded cursor-pointer;
-}
+/* Add any non-Tailwind custom styles here if needed */
