@@ -41,6 +41,6 @@
   "homepage": "https://algebra-solver.pages.dev",
   "engines": {
     "node": ">=23.11.0",
-    "npm": ">=11.3.0"
+    "npm": ">=10.9.2"
   }
 }
