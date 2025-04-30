@@ -1,0 +1,17 @@
+{
+  "name": "algebra-solver",
+  "version": "1.0.0",
+  "description": "A zero-cost, Python-based algebra solver with a modern, dynamic UI using Tailwind CSS",
+  "main": "index.html",
+  "scripts": {
+    "build": "tailwindcss -i css/input.css -o css/output.css --minify",
+    "watch": "tailwindcss -i css/input.css -o css/output.css --watch",
+    "start": "python -m http.server 8000"
+  },
+  "keywords": ["algebra-solver", "tailwindcss", "pyodide", "sympy", "cloudflare-pages"],
+  "author": "Rumsfeld",
+  "license": "MIT",
+  "devDependencies": {
+    "tailwindcss": "^3.4.14"
+  }
+}
