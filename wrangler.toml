@@ -2,3 +2,4 @@ name = "algebra-solver"
 pages_build_output_dir = "."
 [vars]
 NODE_VERSION = "23.11.0"
+NPM_VERSION = "10.9.2"
