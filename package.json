@@ -1,17 +1,38 @@
 {
   "name": "algebra-solver",
   "version": "1.0.0",
-  "description": "A zero-cost, Python-based algebra solver with a modern, dynamic UI using Tailwind CSS",
+  "description": "A zero-cost, Python-based algebra solver using Pyodide and SymPy with a modern Tailwind CSS UI",
   "main": "index.html",
   "scripts": {
-    "build": "tailwindcss -i css/input.css -o css/output.css --minify",
+    "build": "npm run build-css && npm run build-js",
+    "build-css": "tailwindcss -i css/input.css -o css/output.css --minify",
+    "build-js": "terser js/main.js js/solver.js --compress --mangle --output js/bundle.min.js",
     "watch": "tailwindcss -i css/input.css -o css/output.css --watch",
-    "start": "python -m http.server 8000"
+    "start": "python -m http.server 8000",
+    "deploy": "wrangler pages deploy ."
   },
-  "keywords": ["algebra-solver", "tailwindcss", "pyodide", "sympy", "cloudflare-pages"],
+  "keywords": [
+    "algebra-solver",
+    "tailwindcss",
+    "pyodide",
+    "sympy",
+    "cloudflare-pages",
+    "social-media"
+  ],
   "author": "Rumsfeld",
   "license": "MIT",
   "devDependencies": {
-    "tailwindcss": "^3.4.14"
+    "tailwindcss": "^3.4.14",
+    "terser": "^5.33.0",
+    "@cloudflare/wrangler": "^3.83.0"
+  },
+  "optionalDependencies": {
+    "pyodide": "0.26.2",
+    "sympy": "latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Build-1-0-0/algebra-solver.git"
+  },
+  "homepage": "https://algebra-solver.pages.dev"
   }
-}
