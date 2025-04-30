@@ -1,21 +1,26 @@
-/* Custom non-traditional styles */
-#chat-container {
-  transition: transform 0.3s ease;
+/* css/styles.css */
+.thinking::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #4a5568;
+  border-top-color: #1a202c;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
 }
-#chat-container:hover {
-  transform: scale(1.02);
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
-.message {
-  position: relative;
+
+.info-message {
+  @apply bg-green-100 text-green-800 p-2 rounded;
 }
-.message::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  opacity: 0.1;
-  border-radius: inherit;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.5), transparent);
+
+.error-message {
+  @apply bg-red-100 text-red-800 p-2 rounded cursor-pointer;
 }
