@@ -5,19 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dynamic Algebra Solver</title>
   <link rel="stylesheet" href="css/output.css">
+  <link rel="stylesheet" href="css/styles.css">
   <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
 </head>
 <body>
-  <div id="chat-container" class="w-full max-w-lg bg-white rounded-2xl shadow-xl flex flex-col h-[80vh]">
-    <div id="messages" class="flex-1 p-5 overflow-y-auto flex flex-col gap-2">
+  <div id="chat-container" class="chat-container" role="region" aria-label="Equation Solver">
+    <div id="messages" class="flex-1 p-4 sm:p-6 overflow-y-auto flex flex-col gap-2" role="log" aria-live="polite">
       <div class="message bot-message">Welcome! Enter an equation like '2*x + 3 = 9' or 'x**2 - 4 = 0'.</div>
     </div>
-    <div id="input-container" class="p-3 bg-gray-50 border-t border-gray-200">
-      <textarea id="equation" class="w-full border-none p-3 text-base resize-none bg-transparent outline-none min-h-10 max-h-48 font-sans" placeholder="Type your equation..."></textarea>
-      <button id="send-btn" class="bg-chatBlue text-white px-5 py-2 rounded-md hover:bg-blue-700 transition">Send</button>
+    <div id="input-container" class="input-container">
+      <textarea
+        id="equation"
+        class="equation-textarea"
+        placeholder="Type your equation..."
+        aria-label="Enter an equation"
+        rows="1"
+      ></textarea>
+      <button id="send-btn" class="send-btn" aria-label="Solve equation">Send</button>
     </div>
   </div>
-  <script src="js/solver.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/bundle.min.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js');
+      });
+    }
+  </script>
 </body>
 </html>
