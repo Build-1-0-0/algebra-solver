@@ -5,9 +5,9 @@
   "main": "index.html",
   "scripts": {
     "build": "npm run build-css && npm run build-js",
-    "build-css": "tailwindcss -i css/input.css -o css/output.css --minify",
-    "build-js": "terser js/main.js js/solver.js --compress --mangle --output js/bundle.min.js",
-    "watch": "tailwindcss -i css/input.css -o css/output.css --watch",
+    "build-css": "npx update-browserslist-db@latest && npx tailwindcss -i css/input.css -o css/output.css --minify",
+    "build-js": "terser js/main.js js/solver.js js/mathSolver.js --compress --mangle --output js/bundle.min.js",
+    "watch": "npx tailwindcss -i css/input.css -o css/output.css --watch",
     "start": "python -m http.server 8000",
     "deploy": "wrangler pages deploy .",
     "postinstall": "npx update-browserslist-db@latest"
@@ -21,6 +21,9 @@
   ],
   "author": "Rumsfeld",
   "license": "MIT",
+  "dependencies": {
+    "mathjs": "^14.4.0"
+  },
   "devDependencies": {
     "tailwindcss": "^4.1.4",
     "terser": "^5.39.0",
