@@ -15,24 +15,22 @@
     "algebra-solver",
     "tailwindcss",
     "pyodide",
-    "sympy",
     "cloudflare-pages",
     "social-media"
   ],
-  "author": "Rumsfeld",
+  "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
     "tailwindcss": "^3.4.14",
     "terser": "^5.33.0",
-    "@cloudflare/wrangler": "^3.83.0"
+    "@cloudflare/wrangler": "^3.81.0"
   },
   "optionalDependencies": {
-    "pyodide": "0.26.2",
-    "sympy": "latest"
+    "pyodide": "0.26.2"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/Build-1-0-0/algebra-solver.git"
   },
   "homepage": "https://algebra-solver.pages.dev"
-  }
+}
