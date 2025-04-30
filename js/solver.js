@@ -21,10 +21,10 @@ async function initSolver() {
 // Parse input and detect operation
 function parseInput(input) {
   input = input.trim().toLowerCase();
-  let operation = 'solve'; // Default
+  let operation = 'solve';
   let equation = input;
 
-  // Detect operation prefix (e.g., 'simplify:', 'derive:')
+  // Detect operation prefix
   const prefixes = ['solve:', 'simplify:', 'expand:', 'factor:', 'derive:', 'integrate:', 'subs:'];
   for (const prefix of prefixes) {
     if (input.startsWith(prefix)) {
@@ -39,7 +39,6 @@ function parseInput(input) {
 
   // Parse each equation
   const parsed = equations.map(eq => {
-    // Handle substitution (e.g., '2*x + 1 where x = 3')
     let subs = null;
     if (operation === 'subs' && eq.includes('where')) {
       const [expr, subsPart] = eq.split('where').map(s => s.trim());
@@ -50,7 +49,6 @@ function parseInput(input) {
       eq = expr;
     }
 
-    // Handle inequalities
     let rel = '=';
     for (const op of ['<', '>', '<=', '>=']) {
       if (eq.includes(op)) {
@@ -60,7 +58,6 @@ function parseInput(input) {
       }
     }
 
-    // Parse equation or expression
     if (rel === '=') {
       const parts = eq.split('=').map(s => s.trim());
       if (parts.length === 1) {
@@ -77,9 +74,9 @@ function parseInput(input) {
   const normalized = parsed.map(p => ({
     left: p.left ? p.left
       .replace(/\s+/g, '')
-      .replace(/(\d+)([a-zA-Z])/g, '$1*$2') // '2x' -> '2*x'
-      .replace(/([a-zA-Z])\*([a-zA-Z])/g, '$1**2') // 'x*x' -> 'x**2'
-      .replace(/\^/g, '**') // 'x^2' -> 'x**2'
+      .replace(/(\d+)([a-zA-Z])/g, '$1*$2')
+      .replace(/([a-zA-Z])\*([a-zA-Z])/g, '$1**2')
+      .replace(/\^/g, '**')
       .replace(/\++/g, '+') : p.expr,
     right: p.right ? p.right
       .replace(/\s+/g, '')
@@ -94,15 +91,14 @@ function parseInput(input) {
   return { operation, equations: normalized, subs };
 }
 
-// Solve or process input
-async function solveEquation(rawInput) {
+// Solve with Pyodide/SymPy
+async function solveEquationPyodide(rawInput) {
   try {
     const { operation, equations, subs } = parseInput(rawInput);
     if (!equations.length) {
       return { error: 'No valid input provided.' };
     }
 
-    // Convert inputs to Python objects
     const pyInputs = equations.map(eq => ({
       left: eq.left ? pyodide.toPy(eq.left) : null,
       right: pyodide.toPy(eq.right),
@@ -110,7 +106,6 @@ async function solveEquation(rawInput) {
       expr: eq.expr ? pyodide.toPy(eq.expr) : null
     }));
 
-    // Prepare substitution if needed
     const pySubs = subs ? pyodide.toPy(Object.fromEntries(subs.map(s => [s.var, s.value]))) : null;
 
     const result = await pyodide.runPythonAsync(`
@@ -118,7 +113,6 @@ async function solveEquation(rawInput) {
       from sympy.solvers.inequalities import solve_univariate_inequality
       try:
         result = None
-        # Handle single expression operations
         if "${operation}" in ['simplify', 'expand', 'factor', 'derive', 'integrate']:
           expr = sympify(py_inputs[0]['expr'], strict=False)
           if "${operation}" == 'simplify':
@@ -137,11 +131,9 @@ async function solveEquation(rawInput) {
             if not vars:
               raise ValueError("No variables found.")
             result = str(integrate(expr, vars[0]))
-        # Handle substitution
         elif "${operation}" == 'subs':
           expr = sympify(py_inputs[0]['expr'], strict=False)
           result = str(expr.subs(py_subs))
-        # Handle inequalities
         elif "${operation}" == 'inequality':
           left = sympify(py_inputs[0]['left'], strict=False)
           right = sympify(py_inputs[0]['right'], strict=False)
@@ -158,9 +150,7 @@ async function solveEquation(rawInput) {
           elif rel == '>=':
             ineq = left >= right
           result = str(solve_univariate_inequality(ineq, vars[0]))
-        # Handle equations or systems
         else:
-          # Detect variables
           all_vars = set()
           for eq in py_inputs:
             left = sympify(eq['left'], strict=False) if eq['left'] else 0
@@ -170,7 +160,6 @@ async function solveEquation(rawInput) {
           if not all_vars:
             raise ValueError("No variables found.")
           all_vars = list(all_vars)
-          # Single equation
           if len(py_inputs) == 1:
             left = sympify(py_inputs[0]['left'], strict=False)
             right = sympify(py_inputs[0]['right'], strict=False)
@@ -178,7 +167,6 @@ async function solveEquation(rawInput) {
             if not solutions:
               raise ValueError("No real solutions found.")
             result = '[' + ', '.join(str(sol) for sol in solutions) + ']'
-          # System of equations
           else:
             eqs = [Eq(sympify(eq['left'], strict=False), sympify(eq['right'], strict=False)) for eq in py_inputs]
             solutions = solve(eqs, all_vars)
@@ -190,7 +178,6 @@ async function solveEquation(rawInput) {
         "Error: " + str(e)
     `, { py_inputs: pyodide.toPy(pyInputs), py_subs: pySubs });
 
-    // Handle undefined or non-string results
     if (!result || typeof result !== 'string') {
       return { error: 'Unable to solve: Invalid response from solver.' };
     }
@@ -199,7 +186,6 @@ async function solveEquation(rawInput) {
       return { error: `Invalid input: ${result.slice(7)}` };
     }
 
-    // Format output based on operation
     let solution, copyText;
     if (operation === 'solve' && equations.length === 1) {
       solution = `${[...(sympify(pyInputs[0].left) - sympify(pyInputs[0].right)).free_symbols][0]} = ${result}`;
@@ -219,4 +205,4 @@ async function solveEquation(rawInput) {
   }
 }
 
-export { initSolver, solveEquation };
+export { initSolver, solveEquationPyodide };
