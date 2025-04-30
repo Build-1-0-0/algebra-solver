@@ -7,8 +7,8 @@ const urlsToCache = [
   '/css/styles.css',
   '/js/main.js',
   '/js/solver.js',
-  'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js',
-  'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.asm.wasm',
+  'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js',
+  'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.asm.wasm',
 ];
 
 self.addEventListener('install', event => {
