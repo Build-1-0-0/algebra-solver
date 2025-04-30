@@ -8,7 +8,7 @@
 </head>
 <body>
   <div class="chat-container">
-    <div id="messages" class="flex-1 overflow-y-auto p-6"></div>
+    <div id="messages" class="flex-1 overflow-y-auto p-6" aria-live="polite"></div>
     <form id="solver-form" class="input-container">
       <textarea id="equation" class="equation-textarea" placeholder="Enter equation (e.g., '2*x + 3 = 9', 'x^2 - 4 = 0', 'simplify: x^2 + 2x + 1')"></textarea>
       <div class="flex gap-2 mt-2">
@@ -26,12 +26,8 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
-          .then(registration => {
-            console.log('Service Worker registered:', registration);
-          })
-          .catch(error => {
-            console.error('Service Worker registration failed:', error);
-          });
+          .then(registration => console.log('Service Worker registered:', registration))
+          .catch(error => console.error('Service Worker registration failed:', error));
       });
     }
   </script>
