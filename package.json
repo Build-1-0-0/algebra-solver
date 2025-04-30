@@ -40,7 +40,7 @@
   },
   "homepage": "https://algebra-solver.pages.dev",
   "engines": {
-    "node": ">=22.15.0",
+    "node": ">=23.11.0",
     "npm": ">=11.3.0"
   }
 }
