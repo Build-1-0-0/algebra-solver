@@ -1,0 +1,7 @@
+# wrangler.toml
+name = "algebra-solver"
+compatibility_date = "2025-04-30"
+pages_build_output_dir = "."
+
+[[pages]]
+production_branch = "main"
