@@ -1,18 +1,17 @@
 // js/main.js
-let math = null; // Lazy-load math.js
+import { solveEquationMath } from './mathSolver.js';
+import { solveEquationPyodide } from './solver.js';
+
 let pyodide;
 
 async function loadMathJs() {
-  if (!math) {
-    math = await import('mathjs'); // From node_modules (v14.4.0)
-    console.log('math.js loaded');
-  }
+  return await import('mathjs'); // v14.4.0
 }
 
-async function loadPyodideIfNeeded() {
+async function initSolver() {
   if (!pyodide) {
-    pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.27.5/full/" });
-    await pyodide.loadPackage("micropip");
+    pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/' });
+    await pyodide.loadPackage('micropip');
     await pyodide.runPythonAsync(`
       import micropip
       await micropip.install('sympy')
@@ -25,7 +24,7 @@ function addMessage(text, className, icon = '') {
   const messages = document.getElementById('messages');
   const message = document.createElement('div');
   message.className = `message ${className}`;
-  message.innerHTML = `${icon} ${text}`; // Add icon
+  message.innerHTML = `${icon} ${text}`;
   message.setAttribute('tabindex', '0');
   messages.appendChild(message);
   messages.scrollTop = messages.scrollHeight;
@@ -48,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const textarea = document.getElementById('equation');
   const solverTypeSelect = document.getElementById('solver-type');
   const messages = document.getElementById('messages');
-  messages.setAttribute('aria-live', 'polite'); // Accessibility
+  messages.setAttribute('aria-live', 'polite');
 
   textarea.addEventListener('input', () => {
     textarea.style.height = 'auto';
@@ -76,40 +75,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let result;
       if (solverType === 'mathjs') {
-        await loadMathJs();
-        if (equation.startsWith('simplify:')) {
-          const expr = equation.replace('simplify:', '').trim();
-          result = math.simplify(expr).toString();
-        } else {
-          const sides = equation.split('=').map(s => s.trim());
-          const left = math.parse(sides[0]);
-          const right = math.parse(sides[1]);
-          const diff = math.simplify(math.subtract(left, right));
-          const solutions = math.solve(diff, 'x');
-          result = solutions.map(sol => `x = ${sol}`).join(', ') || 'No solution';
-        }
+        const math = await loadMathJs();
+        result = await solveEquationMath(equation, math);
       } else if (solverType === 'pyodide') {
-        await loadPyodideIfNeeded();
-        const left = equation.split('=')[0].trim().replace(/\^/g, '**');
-        const right = equation.split('=')[1].trim().replace(/\^/g, '**');
-        const pyCode = `
-from sympy import symbols, Eq, solve, sympify
-import re
-left = "${left}"
-right = "${right}"
-vars = sorted(set(re.findall(r'[a-zA-Z]+', left + right)))
-syms = symbols(' '.join(vars))
-eq = Eq(sympify(left), sympify(right))
-result = solve(eq, syms)
-str(result)
-`;
-        result = await pyodide.runPythonAsync(pyCode);
-        result = result || 'No solution';
+        await initSolver();
+        result = await solveEquationPyodide(equation);
       }
 
       thinking.remove();
-      addMessage(`Result: ${result}`, 'bot-message', '✅');
-      navigator.clipboard.writeText(`${equation} → ${result}`)
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      addMessage(`Result: ${result.solution}`, 'bot-message', '✅');
+      navigator.clipboard.writeText(result.copyText)
         .then(() => addMessage('Result copied to clipboard!', 'info-message', '📋'))
         .catch(() => addMessage('Failed to copy result.', 'error-message', '❌'));
     } catch (err) {
@@ -133,8 +112,8 @@ str(result)
     }
   });
 
-  loadPyodideIfNeeded().then(() => {
-    addMessage('Ready! Use math.js for algebra (e.g., "2*x + 3 = 9") or SymPy for advanced math (e.g., "x + y = 5").', 'bot-message', 'ℹ️');
+  initSolver().then(() => {
+    addMessage('Ready! Use math.js for algebra (e.g., "2*x + 3 = 9") or SymPy for advanced math (e.g., "x^2 - 4 = 0").', 'bot-message', 'ℹ️');
   }).catch(() => {
     addMessage('SymPy solver failed to load. math.js is still available.', 'error-message', '❌');
   });
