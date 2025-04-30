@@ -18,18 +18,32 @@ async function initSolver() {
   }
 }
 
-// Parse input to handle common user formats (e.g., '2x' -> '2*x')
+// Validate and parse input
 function parseInput(equation) {
+  // Basic validation for unsupported characters
+  if (/[^a-zA-Z0-9\s+\-*/^=().]/.test(equation)) {
+    throw new Error("Unsupported symbols detected. Use numbers, x, +, -, *, /, ^, =, or parentheses.");
+  }
   return equation
-    .replace(/(\d+)([a-zA-Z])/g, "$1*$2") // e.g., '2x' -> '2*x'
-    .replace(/\^/g, "**"); // e.g., 'x^2' -> 'x**2'
+    .replace(/\s+/g, '') // Remove whitespace
+    .replace(/(\d+)([a-zA-Z])/g, "$1*$2") // '2x' -> '2*x'
+    .replace(/\^/g, "**") // 'x^2' -> 'x**2'
+    .replace(/[Xx]/g, 'x') // 'X' or 'x' -> 'x'
+    .replace(/\++/g, '+') // Fix 'x++2' -> 'x+2'
+    .trim();
 }
 
 // Solve an equation
 async function solveEquation(rawEquation) {
-  const equation = parseInput(rawEquation.trim());
-  if (!equation.includes("=")) {
+  if (!rawEquation.includes("=")) {
     return { error: "Please include '=' in the equation (e.g., '2*x + 3 = 9')." };
+  }
+
+  let equation;
+  try {
+    equation = parseInput(rawEquation);
+  } catch (e) {
+    return { error: e.message };
   }
 
   try {
@@ -38,19 +52,21 @@ async function solveEquation(rawEquation) {
       from sympy import symbols, Eq, solve, sympify
       x = symbols('x')
       try:
-        left = sympify("${left.replace(/"/g, '\\"')}")
-        right = sympify("${right.replace(/"/g, '\\"')}")
+        left = sympify("${left.replace(/"/g, '\\"')}", strict=False)
+        right = sympify("${right.replace(/"/g, '\\"')}", strict=False)
         eq = Eq(left, right)
         solutions = solve(eq, x)
+        if not isinstance(solutions, list) or len(solutions) == 0:
+          raise ValueError("No real solutions found.")
         str(solutions)
       except Exception as e:
         "Error: " + str(e)
     `);
     if (result.startsWith("Error: ")) {
-      return { error: `Invalid equation: ${result}` };
+      return { error: `Invalid equation: ${result.slice(7)}` };
     }
-    return { solution: `x = ${result || 'No solution'}` };
+    return { solution: `x = ${result}` };
   } catch (e) {
-    return { error: "Unable to solve. Ensure correct syntax (e.g., '2*x + 3 = 9' or 'x**2 - 4 = 0')." };
+    return { error: `Unable to solve: ${e.message}. Use syntax like '2*x + 3 = 9' or 'x**2 - 4 = 0'.` };
   }
 }
