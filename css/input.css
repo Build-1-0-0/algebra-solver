@@ -1,3 +1,4 @@
+/* css/input.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -24,8 +25,22 @@
   .error-message {
     @apply bg-red-100/90 backdrop-blur-md text-red-900 self-start rounded-bl-none;
   }
+  .info-message {
+    @apply bg-green-100 text-green-800 p-2 rounded;
+  }
   .thinking {
     @apply bg-white/50 backdrop-blur-md text-gray-900 self-start rounded-bl-none animate-pulse relative;
+  }
+  .thinking::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #4a5568;
+    border-top-color: #1a202c;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
   }
   .thinking::after {
     @apply absolute bottom-1 right-2;
@@ -44,9 +59,8 @@
 }
 
 @layer utilities {
-  @keyframes slideIn {
-    from { transform: translateY(30px) scale(0.95); opacity: 0; }
-    to { transform: translateY(0) scale(1); opacity: 1; }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
   @keyframes dots {
     0% { content: "."; }
@@ -56,5 +70,9 @@
   @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
+  }
+  @keyframes slideIn {
+    from { transform: translateY(30px) scale(0.95); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
   }
 }
