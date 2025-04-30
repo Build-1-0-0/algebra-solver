@@ -5,15 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Algebra Solver</title>
   <link href="css/output.css" rel="stylesheet">
-  <link href="css/styles.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="container max-w-md w-full bg-white/80 backdrop-blur-md p-6 rounded-lg shadow-lg">
-    <div id="messages" class="space-y-2 h-96 overflow-y-auto mb-4 p-4 bg-gray-50 rounded"></div>
-    <form id="solver-form" class="flex flex-col gap-2">
-      <textarea id="equation" placeholder="Enter equation (e.g., '2*x + 3 = 9', 'x^2 - 4 = 0', 'simplify: x^2 + 2x + 1')" class="p-2 border rounded resize-none"></textarea>
-      <div id="input-container" class="flex gap-2">
-        <button id="send-btn" type="submit" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Solve</button>
+<body>
+  <div class="chat-container">
+    <div id="messages" class="flex-1 overflow-y-auto p-6"></div>
+    <form id="solver-form" class="input-container">
+      <textarea id="equation" class="equation-textarea" placeholder="Enter equation (e.g., '2*x + 3 = 9', 'x^2 - 4 = 0', 'simplify: x^2 + 2x + 1')"></textarea>
+      <div class="flex gap-2 mt-2">
+        <button id="send-btn" type="submit" class="send-btn">Solve</button>
         <select id="solver-type" class="p-2 border rounded">
           <option value="mathjs">math.js (Algebra)</option>
           <option value="pyodide">SymPy (Advanced)</option>
@@ -21,7 +20,6 @@
       </div>
     </form>
   </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/14.4.0/math.min.js"></script>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js"></script>
   <script type="module" src="js/main.js"></script>
 </body>
