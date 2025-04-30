@@ -1,10 +1,10 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: ["./index.html", "./js/**/*.js"],
   theme: {
     extend: {
       colors: {
-        chatBlue: "#2563eb", // Matches your output.css
+        chatBlue: "#2563eb",
         chatIndigo: "#4f46e5",
         chatGray: "rgba(255, 255, 255, 0.6)",
         chatError: "rgba(254, 226, 226, 0.9)",
