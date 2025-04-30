@@ -11,11 +11,10 @@ function solveEquationMath(equation) {
     const left = math.parse(sides[0]);
     const right = math.parse(sides[1]);
 
-    // Move to left: left - right = 0
     const diff = math.simplify(math.subtract(left, right));
     const solutions = math.solve(diff, 'x');
 
-    if (solutions.length === 0) {
+    if (!solutions || solutions.length === 0) {
       return { error: 'No solution found.' };
     }
 
