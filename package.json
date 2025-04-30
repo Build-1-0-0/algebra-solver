@@ -23,7 +23,7 @@
   "devDependencies": {
     "tailwindcss": "^3.4.14",
     "terser": "^5.33.0",
-    "@cloudflare/wrangler": "^4.11.0"
+    "wrangler": "^4.14.0"
   },
   "optionalDependencies": {
     "pyodide": "0.26.2"
